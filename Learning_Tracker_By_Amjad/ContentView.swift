@@ -160,6 +160,7 @@ struct ContentView: View {
                 ActivityView()
             }
         } // End of NavigationStack
+
     }
 }
 

@@ -79,7 +79,7 @@ struct ActivityView: View {
                             .font(.body)
                             .fontWeight(calendar.isDateInToday(day) ? .bold: .regular)
                         
-                            .foregroundStyle(calendar.isDateInToday(day) ? .primary : .primary)
+                            .foregroundStyle(calendar.isDateInToday(day) ? .primary: .primary)
                             .frame(width: 36,height: 36)
                         
                         // Highlights today's date
@@ -95,17 +95,85 @@ struct ActivityView: View {
             }
             .padding(.top, 8)
         }
-        .frame(maxWidth: .infinity,
-               maxHeight: .infinity,
-               alignment: .topLeading)
-        .padding(.top,24)
-        .padding(.horizontal, 24)
+            .padding(.horizontal, 16)
         
         // MARK: - Learning Statistics
         // Arranges learned and frozen counters horizontally
         HStack(spacing: 16) {
+            
+            // MARK: - Learned Counter
+            // Displays the number of learned days
+            VStack(spacing: 4) {
+                Image(systemName: "flame.fill")
+                    .foregroundStyle(.orange)
+                    .font(.title3)
+                Text("0")
+                    .font(.title)
+                    .fontWeight(.bold)
 
+                Text("Learned")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .glassEffect(.regular,in: RoundedRectangle(cornerRadius: 48))
+            
+// MARK: - Frozen Counter
+// Displays the number of frozen days
+            VStack(spacing: 4) {
+                Image(systemName:"snowflake")
+                    .foregroundStyle(.cyan)
+                    .font(.title3)
+                Text("0")
+                    .font(.title)
+                    .fontWeight(.bold)
+
+                Text("Frozen")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .glassEffect(.regular,
+                in: RoundedRectangle(cornerRadius: 48))
+            
         }
+// MARK: - Log as Learned Button
+//Allows user to record today's learning activity
+        Button {
+//Learning logic will be added later
+        }label: {
+            Text("Log as Learned")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(width: 330,height: 330)
+                .padding(.vertical, 16)
+                .background(.orange)
+                .clipShape(Circle())
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(16)
+// MARK: - Freeze Button
+// Allows the user to freeze their learning streak for a day
+        Button {
+            // Freeze logic will be added later
+        } label: {
+            Text("Freeze for a day")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 48)
+                .padding(.vertical, 12)
+                .background(.cyan)
+                .clipShape(Capsule())
+        }
+        .frame(maxWidth: .infinity)
+// MARK: - Freeze Usage Counter
+// Displays how many freezes have been used
+        Text("0 out of 2 Freezes used")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity)
     }
 }
 
