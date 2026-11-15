@@ -107,22 +107,24 @@ struct ActivityView: View {
                                 calendar.isDateInToday(day)
                                 ? .bold : .regular
                             )
-                            .foregroundStyle(
-                                calendar.isDateInToday(day)
-                                ? Color.primary
-                                : isLearned(day)
-                                    ? Color.orange
-                                    : Color.primary
+                            .foregroundStyle(isLearned(day)
+                                             ? Color.orange
+                                         : isFreezed(day)
+                                          ? Color.cyan
+                                         : calendar.isDateInToday(day)
+                                          ? Color.orange
+                                             : Color.primary
                             )
                             .frame(width: 36, height: 36)
                             .background {
-
                                 Circle()
                                     .fill(
-                                        calendar.isDateInToday(day)
-                                        ? Color.orange
-                                        : isLearned(day)
+                                         isLearned(day)
                                             ? Color.orange.opacity(0.2)
+                                        : isFreezed(day)
+                                         ? Color.cyan.opacity(0.2)
+                                        : calendar.isDateInToday(day)
+                                         ? Color.orange.opacity(0.2)
                                             : Color.clear
                                     )
                             }
@@ -211,6 +213,7 @@ struct ActivityView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(16)
         .disabled(viewModel.hasLearnedToday)
+        
 
         // MARK: - Freeze Button
 
@@ -228,6 +231,9 @@ struct ActivityView: View {
         }
         .frame(maxWidth: .infinity)
         .disabled (viewModel.hasFrozenToday || viewModel.hasLearnedToday || viewModel.remainingFreezes == 0)
+        .opacity(
+            viewModel.hasFrozenToday || viewModel.hasLearnedToday || viewModel.remainingFreezes == 0 ? 0.2 : 1.0
+        )
         
         // MARK: - Freeze Usage Counter
 

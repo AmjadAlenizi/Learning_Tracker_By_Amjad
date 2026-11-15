@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Onboarding Screen
 
-struct ContentView: View {
+struct OnboardingView: View {
 
     // MARK: - State Properties
 
@@ -206,5 +206,5 @@ struct ContentView: View {
 // MARK: - SwiftUI Preview
 
 #Preview {
-    ContentView()
+    OnboardingView()
 }
