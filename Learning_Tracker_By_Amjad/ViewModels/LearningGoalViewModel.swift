@@ -11,13 +11,21 @@ class LearningGoalViewModel {
 
     private(set) var goal = LearningGoal()
     
+    // MARK: - Current Date
+
+    private(set) var currentDate = Date.now
+
+    // MARK: - Refresh Current Date
+    func refreshCurrentDate() {
+        currentDate = Date.now
+    }
     func updateGoal(newTitle: String) {
         goal.title = newTitle
     }
-    
+
     // MARK: - Learning Progress
 
-    // Stores all dates on which learning was logged
+    // Stores dates on which learning was logged
     var learnedDates: [Date] = []
 
     // Checks whether learning has been logged today
@@ -27,7 +35,7 @@ class LearningGoalViewModel {
         }
     }
 
-    // Stores all dates on which Freeze was used
+    // Stores dates on which Freeze was used
     var frozenDates: [Date] = []
 
     // Checks whether Freeze has been logged today
@@ -37,13 +45,12 @@ class LearningGoalViewModel {
         }
     }
 
-    // Tracks the current number of consecutive learning days
+    // Tracks consecutive learning days
     private(set) var currentStreak: Int = 0
 
     // MARK: - Log Learning
 
     func logLearning() {
-
         guard !hasLearnedToday else {
             return
         }
@@ -67,7 +74,10 @@ class LearningGoalViewModel {
                   dateToCheck < calendar.startOfDay(for: today) {
 
                 let isFrozen = frozenDates.contains { date in
-                    calendar.isDate(date, inSameDayAs: dateToCheck)
+                    calendar.isDate(
+                        date,
+                        inSameDayAs: dateToCheck
+                    )
                 }
 
                 // A missed day breaks the streak
@@ -101,7 +111,6 @@ class LearningGoalViewModel {
     // MARK: - Log Freeze
 
     func logFreeze() {
-
         guard !hasFrozenToday else {
             return
         }
@@ -138,5 +147,128 @@ class LearningGoalViewModel {
 
     func updateDuration(newDuration: LearningDuration) {
         goal.duration = newDuration
+    }
+
+    var goalDurationDays: Int {
+        let calendar = Calendar.current
+        let endDate: Date?
+
+        switch goal.duration {
+        case .week:
+            endDate = calendar.date(
+                byAdding: .day,
+                value: 7,
+                to: goal.startDate
+            )
+
+        case .month:
+            endDate = calendar.date(
+                byAdding: .month,
+                value: 1,
+                to: goal.startDate
+            )
+
+        case .year:
+            endDate = calendar.date(
+                byAdding: .year,
+                value: 1,
+                to: goal.startDate
+            )
+        }
+
+        guard let endDate else {
+            return 0
+        }
+
+        return calendar.dateComponents(
+            [.day],
+            from: calendar.startOfDay(for: goal.startDate),
+            to: calendar.startOfDay(for: endDate)
+        ).day ?? 0
+    }
+
+
+    // MARK: - Completed Learning Days
+
+    var completedDays: Int {
+        let calendar = Calendar.current
+
+        let startDate = calendar.startOfDay(
+            for: goal.startDate
+        )
+
+        guard let endDate = calendar.date(
+            byAdding: .day,
+            value: goalDurationDays,
+            to: startDate
+        ) else {
+            return 0
+        }
+
+        let allDates = learnedDates + frozenDates
+
+        let validDays = allDates.filter { date in
+            let day = calendar.startOfDay(for: date)
+
+            return day >= startDate && day < endDate
+        }
+
+        let uniqueDays = Set(
+            validDays.map {
+                calendar.startOfDay(for: $0)
+            }
+        )
+
+        return uniqueDays.count
+    }
+
+
+    // MARK: - Goal End Check
+
+    var hasGoalEnded: Bool {
+        let calendar = Calendar.current
+
+        guard let endDate = calendar.date(
+            byAdding: .day,
+            value: goalDurationDays,
+            to: calendar.startOfDay(for: goal.startDate)
+        ) else {
+            return false
+        }
+
+        return currentDate >= endDate
+    }
+
+    // MARK: - Goal Success Check
+
+    var hasGoalSucceeded: Bool {
+        hasGoalEnded &&
+        goalDurationDays > 0 &&
+        completedDays == goalDurationDays
+    }
+
+    // MARK: - Confirm Goal Update
+
+    func confirmGoalUpdate(
+        newTitle: String,
+        newDuration: LearningDuration
+    ) {
+        let trimmedTitle = newTitle.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard !trimmedTitle.isEmpty else {
+            return
+        }
+
+        // Update learning goal
+        goal.title = trimmedTitle
+        goal.duration = newDuration
+        goal.startDate = Date.now
+
+        // Reset progress for the new goal
+        currentStreak = 0
+        learnedDates.removeAll()
+        frozenDates.removeAll()
     }
 }
