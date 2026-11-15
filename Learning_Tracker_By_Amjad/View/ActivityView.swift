@@ -35,12 +35,12 @@ struct ActivityView: View {
 
     // MARK: - Learned Date Check
 
-    // Checks whether a specific day was logged as Learned
     private func isLearned(_ day: Date) -> Bool {
         viewModel.learnedDates.contains { learnedDate in
             calendar.isDate(learnedDate, inSameDayAs: day)
         }
     }
+
     private func isFreezed(_ day: Date) -> Bool {
         viewModel.frozenDates.contains { frozenDate in
             calendar.isDate(frozenDate, inSameDayAs: day)
@@ -56,7 +56,6 @@ struct ActivityView: View {
             // MARK: - Activity Header
 
             HStack {
-
                 Text("Activity")
                     .font(.title)
                     .fontWeight(.bold)
@@ -65,13 +64,14 @@ struct ActivityView: View {
 
                 // MARK: - Calendar Button
 
-                Button {
-                    // Navigation will be added later
+                NavigationLink {
+                    CalendarView(viewModel: viewModel)
                 } label: {
                     Image(systemName: "calendar")
                         .font(.system(size: 22))
                         .foregroundStyle(.primary)
                 }
+                .tint(.primary)
 
                 // MARK: - Edit Goal Button
 
@@ -83,6 +83,7 @@ struct ActivityView: View {
                         .foregroundStyle(.primary)
                 }
             }
+            .tint(.primary)
 
             // MARK: - Weekly Calendar
 
@@ -93,9 +94,7 @@ struct ActivityView: View {
             // MARK: - Week Days
 
             HStack(spacing: 0) {
-
                 ForEach(weekDates, id: \.self) { day in
-
                     VStack(spacing: 8) {
 
                         Text(day, format: .dateTime.weekday(.narrow))
@@ -107,25 +106,26 @@ struct ActivityView: View {
                                 calendar.isDateInToday(day)
                                 ? .bold : .regular
                             )
-                            .foregroundStyle(isLearned(day)
-                                             ? Color.orange
-                                         : isFreezed(day)
-                                          ? Color.cyan
-                                         : calendar.isDateInToday(day)
-                                          ? Color.orange
-                                             : Color.primary
+                            .foregroundStyle(
+                                isLearned(day)
+                                ? Color.orange
+                                : isFreezed(day)
+                                ? Color.cyan
+                                : calendar.isDateInToday(day)
+                                ? Color.orange
+                                : Color.primary
                             )
                             .frame(width: 36, height: 36)
                             .background {
                                 Circle()
                                     .fill(
-                                         isLearned(day)
-                                            ? Color.orange.opacity(0.2)
+                                        isLearned(day)
+                                        ? Color.orange.opacity(0.2)
                                         : isFreezed(day)
-                                         ? Color.cyan.opacity(0.2)
+                                        ? Color.cyan.opacity(0.2)
                                         : calendar.isDateInToday(day)
-                                         ? Color.orange.opacity(0.2)
-                                            : Color.clear
+                                        ? Color.orange.opacity(0.2)
+                                        : Color.clear
                                     )
                             }
                     }
@@ -136,6 +136,7 @@ struct ActivityView: View {
 
         }
         .padding(.horizontal, 16)
+        .navigationBarBackButtonHidden(true)
 
         // MARK: - Learning Statistics
 
@@ -144,7 +145,6 @@ struct ActivityView: View {
             // MARK: - Learned Counter
 
             VStack(spacing: 4) {
-
                 Image(systemName: "flame.fill")
                     .foregroundStyle(.orange)
                     .font(.title3)
@@ -167,7 +167,6 @@ struct ActivityView: View {
             // MARK: - Frozen Counter
 
             VStack(spacing: 4) {
-
                 Image(systemName: "snowflake")
                     .foregroundStyle(.cyan)
                     .font(.title3)
@@ -193,7 +192,6 @@ struct ActivityView: View {
         Button {
             viewModel.logLearning()
         } label: {
-
             Text(
                 viewModel.hasLearnedToday
                 ? "Logged as Learned"
@@ -213,14 +211,12 @@ struct ActivityView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(16)
         .disabled(viewModel.hasLearnedToday)
-        
 
         // MARK: - Freeze Button
 
         Button {
             viewModel.logFreeze()
         } label: {
-
             Text("Freeze for a day")
                 .font(.headline)
                 .foregroundStyle(.white)
@@ -230,11 +226,17 @@ struct ActivityView: View {
                 .clipShape(Capsule())
         }
         .frame(maxWidth: .infinity)
-        .disabled (viewModel.hasFrozenToday || viewModel.hasLearnedToday || viewModel.remainingFreezes == 0)
-        .opacity(
-            viewModel.hasFrozenToday || viewModel.hasLearnedToday || viewModel.remainingFreezes == 0 ? 0.2 : 1.0
+        .disabled(
+            viewModel.hasFrozenToday ||
+            viewModel.hasLearnedToday ||
+            viewModel.remainingFreezes == 0
         )
-        
+        .opacity(
+            viewModel.hasFrozenToday ||
+            viewModel.hasLearnedToday ||
+            viewModel.remainingFreezes == 0 ? 0.2 : 1.0
+        )
+
         // MARK: - Freeze Usage Counter
 
         Text("\(viewModel.frozenDates.count) out of \(viewModel.freezeLimit) Freezes used")
