@@ -78,6 +78,7 @@ struct EditGoalView: View {
                     )
                     .accessibilityLabel("Update goal")
                 }
+               
 
                 // MARK: - Goal Input
 
@@ -138,7 +139,7 @@ struct EditGoalView: View {
             }
             .padding(.horizontal, 24)
             .padding(.top, 12)
-            .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity)
         }
         .foregroundStyle(.primary)
         .navigationBarBackButtonHidden(true)
