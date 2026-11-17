@@ -94,6 +94,16 @@ struct ActivityView: View {
                         Spacer()
                         
                         NavigationLink {
+                            AchievementsView(viewModel: viewModel)
+                        } label: {
+                            Image(systemName: "trophy")
+                                .font(.system(size: 22))
+                                .foregroundStyle(.primary)
+                                .frame(minWidth: 44, minHeight: 44)
+                        }
+                        .accessibilityLabel("Achievements")
+
+                        NavigationLink {
                             CalendarView(viewModel: viewModel)
                         } label: {
                             Image(systemName: "calendar")
@@ -104,6 +114,7 @@ struct ActivityView: View {
                         .accessibilityLabel("Calendar")
                         
                         NavigationLink {
+                            
                             EditGoalView(viewModel: viewModel)
                         } label: {
                             Image(systemName: "square.and.pencil")

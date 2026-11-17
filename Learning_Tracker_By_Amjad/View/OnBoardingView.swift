@@ -8,7 +8,7 @@ struct OnboardingView: View {
     // MARK: - State Properties
 
     // Stores and manages the learning goal
-    @State private var viewModel = LearningGoalViewModel()
+    var viewModel : LearningGoalViewModel
 
     // Controls navigation to the Activity screen
     @State private var showActivity = false
@@ -153,6 +153,7 @@ struct OnboardingView: View {
                         if !viewModel.goal.title
                             .trimmingCharacters(in: .whitespacesAndNewlines)
                             .isEmpty {
+                            viewModel.startGoal()
 
                             showActivity = true
                         }
@@ -206,5 +207,5 @@ struct OnboardingView: View {
 // MARK: - SwiftUI Preview
 
 #Preview {
-    OnboardingView()
+    OnboardingView(viewModel: LearningGoalViewModel())
 }

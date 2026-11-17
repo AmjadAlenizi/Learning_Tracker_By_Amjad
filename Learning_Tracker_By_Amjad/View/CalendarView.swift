@@ -139,13 +139,13 @@ struct CalendarView: View {
         } ?? false
         
         let isLearned = date.map { date in
-            viewModel.learnedDates.contains {
+            viewModel.allLearnedDates.contains {
                 calendar.isDate($0, inSameDayAs: date)
             }
         } ?? false
         
         let isFrozen = date.map { date in
-            viewModel.frozenDates.contains {
+            viewModel.allFrozenDates.contains {
                 calendar.isDate($0, inSameDayAs: date)
             }
         } ?? false

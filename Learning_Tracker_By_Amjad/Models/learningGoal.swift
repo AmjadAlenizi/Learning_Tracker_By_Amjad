@@ -19,7 +19,7 @@ struct LearningGoal {
 // MARK: - Learning Duration
 
 // Defines the available learning durations
-enum LearningDuration {
+enum LearningDuration:Codable {
 
     case week
     case month
