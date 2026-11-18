@@ -78,69 +78,32 @@ struct OnboardingView: View {
 
                     HStack(spacing: 12) {
 
-                        // Week Button
+                        ForEach(
+                            [LearningDuration.week, .month, .year],
+                            id: \.self
+                        ) { duration in
 
-                        Button("Week") {
-                            viewModel.updateDuration(newDuration: .week)
+                            Button(duration.displayName) {
+                                viewModel.updateDuration(newDuration: duration)
+                            }
+                            .foregroundStyle(
+                                viewModel.goal.duration == duration
+                                ? .orange : .secondary
+                            )
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                viewModel.goal.duration == duration
+                                ? Color.orange.opacity(0.15)
+                                : Color.clear
+                            )
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: 24)
+                            )
                         }
-                        .foregroundStyle(
-                            viewModel.goal.duration == .week
-                            ? .orange : .secondary
-                        )
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            viewModel.goal.duration == .week
-                            ? Color.orange.opacity(0.15)
-                            : Color.clear
-                        )
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 24)
-                        )
-
-                        // Month Button
-
-                        Button("Month") {
-                            viewModel.updateDuration(newDuration: .month)
-                        }
-                        .foregroundStyle(
-                            viewModel.goal.duration == .month
-                            ? .orange : .secondary
-                        )
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            viewModel.goal.duration == .month
-                            ? Color.orange.opacity(0.15)
-                            : Color.clear
-                        )
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 24)
-                        )
-
-                        // Year Button
-
-                        Button("Year") {
-                            viewModel.updateDuration(newDuration: .year)
-                        }
-                        .foregroundStyle(
-                            viewModel.goal.duration == .year
-                            ? .orange : .secondary
-                        )
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            viewModel.goal.duration == .year
-                            ? Color.orange.opacity(0.15)
-                            : Color.clear
-                        )
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 24)
-                        )
                     }
+
 
                     // MARK: - Flexible Spacing
 

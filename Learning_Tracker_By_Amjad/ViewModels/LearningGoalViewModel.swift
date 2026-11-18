@@ -226,6 +226,7 @@ class LearningGoalViewModel {
     }
 
         // MARK: - Refresh Current Date
+    
     func refreshCurrentDate() {
         currentDate = Date.now
         refreshStreak()
