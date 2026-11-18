@@ -192,7 +192,7 @@ struct ActivityView: View {
                                 .foregroundStyle(.orange)
                                 .font(.title3)
                             
-                            Text("\(viewModel.learnedDates.count)")
+                            Text("\(viewModel.learnedDates.count) \(viewModel.learnedDates.count == 1 ? "day" : "days")")
                                 .font(.title)
                                 .fontWeight(.bold)
                             
@@ -212,7 +212,7 @@ struct ActivityView: View {
                                 .foregroundStyle(.cyan)
                                 .font(.title3)
                             
-                            Text("\(viewModel.frozenDates.count)")
+                            Text("\(viewModel.frozenDates.count) \(viewModel.frozenDates.count == 1 ? "day" : "days")")
                                 .font(.title)
                                 .fontWeight(.bold)
                             

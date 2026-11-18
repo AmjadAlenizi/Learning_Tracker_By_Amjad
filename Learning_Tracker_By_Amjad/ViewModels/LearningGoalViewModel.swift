@@ -51,6 +51,7 @@ class LearningGoalViewModel {
     
     init() {
         loadSavedData()
+        refreshStreak()
     }
     
     // MARK: - Load Saved Data
@@ -225,11 +226,12 @@ class LearningGoalViewModel {
     }
 
         // MARK: - Refresh Current Date
-        
-        func refreshCurrentDate() {
-            currentDate = Date.now
-            recordCompletedGoalIfNeeded()
-        }
+    func refreshCurrentDate() {
+        currentDate = Date.now
+        refreshStreak()
+        recordCompletedGoalIfNeeded()
+    }
+
         
         // MARK: - Update Goal
         
@@ -272,6 +274,56 @@ class LearningGoalViewModel {
                 Calendar.current.isDateInToday(date)
             }
         }
+    
+    
+    // MARK: - Streak Expiration
+
+    private let streakGracePeriod: TimeInterval = 32 * 60 * 60
+
+    private func streakDeadline(after lastLearning: Date) -> Date {
+        let calendar = Calendar.current
+        var deadline = lastLearning.addingTimeInterval(streakGracePeriod)
+
+        for freeze in frozenDates.sorted() {
+            let freezeStart = calendar.startOfDay(for: freeze)
+
+            guard let freezeEnd = calendar.date(
+                byAdding: .day,
+                value: 1,
+                to: freezeStart
+            ) else {
+                continue
+            }
+
+            // A Freeze must begin before the streak expires.
+            if freezeStart <= deadline && freezeEnd > lastLearning {
+                // Protect the full frozen day, then allow 32 hours.
+                deadline = max(
+                    deadline,
+                    freezeEnd.addingTimeInterval(streakGracePeriod)
+                )
+            }
+        }
+
+        return deadline
+    }
+
+    private func isStreakValid(at date: Date) -> Bool {
+        guard let lastLearning = learnedDates.max() else {
+            return false
+        }
+
+        return date <= streakDeadline(after: lastLearning)
+    }
+
+    func refreshStreak() {
+        guard currentStreak > 0 else { return }
+
+        if !isStreakValid(at: .now) {
+            currentStreak = 0
+            saveProgress()
+        }
+    }
         
         // MARK: - Log Learning
         
@@ -286,67 +338,23 @@ class LearningGoalViewModel {
             let calendar = Calendar.current
             let today = Date.now
             
-            // MARK: - Replace Today's Freeze with Learned
+            // MARK: - Calculate Learning Streak
+
+            if learnedDates.isEmpty {
+                currentStreak = 1
+            } else if isStreakValid(at: today) {
+                currentStreak += 1
+            } else {
+                currentStreak = 1
+            }
             
-            // If Freeze was used today, remove it.
-            // The Freeze automatically returns to the balance.
+            // MARK: - Replace Today's Freeze with Learned.
             
             frozenDates.removeAll { date in
                 calendar.isDateInToday(date)
             }
             allFrozenDates.removeAll { date in
                 calendar.isDateInToday(date)
-            }
-            
-            // MARK: - Calculate Learning Streak
-            
-            if let lastLearnedDate = learnedDates.last {
-                
-                var checkDate = calendar.date(
-                    byAdding: .day,
-                    value: 1,
-                    to: calendar.startOfDay(for: lastLearnedDate)
-                )
-                
-                var streakContinues = true
-                
-                // Check days between last Learned and today
-                
-                while let dateToCheck = checkDate,
-                      dateToCheck < calendar.startOfDay(for: today) {
-                    
-                    let isFrozen = frozenDates.contains { date in
-                        calendar.isDate(
-                            date,
-                            inSameDayAs: dateToCheck
-                        )
-                    }
-                    
-                    // A missed day breaks the streak
-                    
-                    if !isFrozen {
-                        streakContinues = false
-                        break
-                    }
-                    
-                    checkDate = calendar.date(
-                        byAdding: .day,
-                        value: 1,
-                        to: dateToCheck
-                    )
-                }
-                
-                if streakContinues {
-                    currentStreak += 1
-                } else {
-                    currentStreak = 1
-                }
-                
-            } else {
-                
-                // First Learned day
-                
-                currentStreak = 1
             }
             
             // Record today's learning
@@ -372,6 +380,17 @@ class LearningGoalViewModel {
                 return
             }
             
+
+            refreshStreak()
+
+            // Allow Freeze on the first day of a new goal.
+            // Prevent Freeze from restoring an expired streak.
+
+            guard learnedDates.isEmpty ||
+                  (currentStreak > 0 && isStreakValid(at: .now)) else {
+                return
+            }
+
             frozenDates.append(Date.now)
             allFrozenDates.append(Date.now)
             
